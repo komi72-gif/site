@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ссылки Ермолаева Влада</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin: 0 0 5px 0;
+            font-size: 2em;
+        }
+        .subhead {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: background 0.2s;
+            border-left: 4px solid #3498db;
+        }
+        li:hover {
+            background: #edf2f7;
+        }
+        .link-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .link-title a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        .link-title a:hover {
+            text-decoration: underline;
+            color: #2980b9;
+        }
+        .url-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .link-url {
+            flex: 1;
+            font-size: 0.9em;
+            color: #555;
+            background: #fff;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+        }
+        .copy-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+        .copy-btn:hover {
+            background: #e0e0e0;
+        }
+        .toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #aaa;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ермолаев Влад</h1>
+        <div class="subhead">Мои контакты и ссылки</div>
+        
+        <ul>
+            <li>
+                <div class="link-title">
+                    <a href="mailto:Vlad.ermolaev96@gmail.com">📧 Электронная почта</a>
+                </div>
+                <div class="url-container">
+                    <span class="link-url">Vlad.ermolaev96@gmail.com</span>
+                    <button class="copy-btn" data-copy="Vlad.ermolaev96@gmail.com" title="Скопировать адрес">📋</button>
+                </div>
+            </li>
+            <li>
+                <div class="link-title">
+                    <a href="https://t.me/Schoko_Vlad" target="_blank" rel="noopener">✈️ Telegram</a>
+                </div>
+                <div class="url-container">
+                    <span class="link-url">https://t.me/Schoko_Vlad</span>
+                    <button class="copy-btn" data-copy="https://t.me/Schoko_Vlad" title="Скопировать ссылку">📋</button>
+                </div>
+            </li>
+            <!-- Сюда можно добавить ещё ссылки по такому же принципу -->
+        </ul>
+        
+        <div class="footer">
+            Нажмите на название, чтобы перейти, или скопируйте адрес с помощью кнопки 📋
+        </div>
+    </div>
+
+    <!-- Тост-уведомление -->
+    <div id="toast" class="toast">Скопировано!</div>
+
+    <script>
+        // Находим все кнопки копирования
+        const copyButtons = document.querySelectorAll('.copy-btn');
+        const toast = document.getElementById('toast');
+
+        // Функция показа уведомления
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Обработчик клика по кнопке
+        copyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const textToCopy = btn.getAttribute('data-copy'); // берём текст из data-атрибута
+                if (!textToCopy) return;
+
+                // Используем Clipboard API
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast('Скопировано!');
+                }).catch(err => {
+                    console.error('Ошибка копирования:', err);
+                    // Запасной вариант для старых браузеров
+                    const textarea = document.createElement('textarea');
+                    textarea.value = textToCopy;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    showToast('Скопировано!');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
