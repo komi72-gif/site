@@ -101,6 +101,28 @@ h1 {
     opacity: 1;
 }
 
+/* Стили для новой кнопки сохранения контакта */
+.save-contact-btn {
+    background: #8c2d1f;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.save-contact-btn:hover {
+    background: #6e2419;
+}
+
 .footer {
     text-align: center;
     font-size: 13px;
@@ -119,6 +141,7 @@ h1 {
     border-radius: 20px;
     opacity: 0;
     transition: 0.3s;
+    z-index: 1000;
 }
 
 .toast.show {
@@ -139,7 +162,7 @@ h1 {
 <div class="card">
     <div class="link-title"><a href="tel:+79099198580">📞 Телефон</a></div>
     <div class="row">
-        <div class="field">+7 (909) 919-85-80</div>
+        <div class="field" id="phoneField">+7 (909) 919-85-80</div>
         <button class="copy-btn" data-copy="+79099198580">📋</button>
     </div>
 </div>
@@ -147,7 +170,7 @@ h1 {
 <div class="card">
     <div class="link-title"><a href="mailto:Vlad.ermolaev96@gmail.com">📧 Электронная почта</a></div>
     <div class="row">
-        <div class="field">Vlad.ermolaev96@gmail.com</div>
+        <div class="field" id="emailField">Vlad.ermolaev96@gmail.com</div>
         <button class="copy-btn" data-copy="Vlad.ermolaev96@gmail.com">📋</button>
     </div>
 </div>
@@ -160,6 +183,14 @@ h1 {
     </div>
 </div>
 
+<!-- Новая карточка с кнопкой для сохранения контакта -->
+<div class="card">
+    <div class="link-title">📇 Сохранить контакт</div>
+    <div style="margin-top: 12px;">
+        <button id="saveContactBtn" class="save-contact-btn">➕ Сохранить в телефонную книгу</button>
+    </div>
+</div>
+
 <div class="footer">Нажмите на название, чтобы перейти, или скопируйте адрес с помощью кнопки 📋</div>
 
 </div>
@@ -167,21 +198,64 @@ h1 {
 <div id="toast" class="toast">Скопировано</div>
 
 <script>
-const buttons = document.querySelectorAll('.copy-btn');
+// Функция показа уведомления
 const toast = document.getElementById('toast');
-
-function showToast() {
+function showToast(message) {
+    toast.textContent = message;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 1500);
 }
 
-buttons.forEach(btn => {
+// Копирование текста
+const copyButtons = document.querySelectorAll('.copy-btn');
+copyButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         const text = btn.dataset.copy;
         navigator.clipboard.writeText(text);
-        showToast();
+        showToast('Скопировано');
     });
 });
+
+// Новая функция сохранения контакта
+const saveContactBtn = document.getElementById('saveContactBtn');
+if (saveContactBtn) {
+    saveContactBtn.addEventListener('click', () => {
+        // Берём данные из полей
+        const phoneRaw = document.getElementById('phoneField')?.innerText || '+7 (909) 919-85-80';
+        const emailRaw = document.getElementById('emailField')?.innerText || 'Vlad.ermolaev96@gmail.com';
+        // Очищаем телефон от лишних символов, оставляем только цифры и плюс (для vCard)
+        const phoneClean = phoneRaw.replace(/[^\d+]/g, '');
+        const email = emailRaw.trim();
+        const name = 'Владислав Ермолаев';
+
+        // Формируем vCard
+        const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+TEL;TYPE=CELL:${phoneClean}
+EMAIL:${email}
+END:VCARD`;
+
+        // Создаём Blob и предлагаем сохранить
+        try {
+            const blob = new Blob([vCardData], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'contact.vcf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('Контакт сохранён! Откройте файл, чтобы добавить в книгу.');
+        } catch (err) {
+            // Запасной вариант: data URI
+            const dataUri = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vCardData);
+            window.location.href = dataUri;
+            showToast('Если файл не скачался, нажмите ещё раз');
+        }
+    });
+}
 </script>
 
 </body>
